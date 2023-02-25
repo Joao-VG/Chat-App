@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const userRoutes = require("./Routes/userRoutes");
 
 const app = express();
 require("dotenv").config();
@@ -8,7 +9,9 @@ require("dotenv").config();
 app.use(cors());
 app.use(express.json());
 
-mongoose.set('strictQuery', true)
+app.use("/api/auth", userRoutes);
+
+mongoose.set('strictQuery', true);
 
 mongoose
 .connect(process.env.MONGO_URL, {

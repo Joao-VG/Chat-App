@@ -2,17 +2,77 @@ import {React ,useState, useEffect } from 'react';
 import styled from "styled-components";
 import { Link } from 'react-router-dom';
 import Logo from "../assets/logo.svg"
+import axios from "axios";
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { registerRoute } from '../Utils/Api_routes';
 
 function Register() {
 
-    const [Values,SetValues]
-    const handleSubmit = (event) => {
+    const [Values,SetValues] = useState({
+        username: "",
+        email: "",
+        password: "",
+        confirmPassword:"",
+    });
+
+    const toast_Option = {
+
+            position:"bottom-right",
+            autoClose: 8000,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "dark",
+
+        }
+    
+    
+    const notify = () => toast("Wow so easy !");
+
+    const handleSubmit = async (event) => {
         event.preventDefault()
-        alert("form");
+        if (handleValidation()) {
+            console.log("In validation", registerRoute)
+            const { password,confirmPassword,username,email} = Values;
+                const {data} = await  axios.post(registerRoute, {
+                    username, 
+                    email,
+                    password,
+                });
+        }   
     };
 
-    const handleChange = (e) => {
+    const handleValidation = () => {
+        const { password,confirmPassword,username,email} = Values;
+        
+        if(password !== confirmPassword){
+            toast.error("As senhas devem ser iguais", toast_Option );
+            return false;
+         }
 
+         else if ( username.length < 3) {
+            toast.error("Username precisa ter mais que 3 caracteres", toast_Option);
+            return false;
+         }
+         
+         else if ( password.length < 8) {
+            toast.error("Sua senha deve ter mais que 8 caracteres", toast_Option);
+            return false;
+         }
+         
+         else if ( email === "") {
+            toast.error("Email é obrigatorio",toast_Option)
+            return false;
+         }
+         return true;
+
+    };
+
+    const handleChange = (event) => {
+        SetValues({
+            ...Values,[event.target.name]: event.target.value
+        });
     }
 
     
@@ -59,7 +119,7 @@ function Register() {
                 onChange={ (e) => handleChange(e)}
             />
 
-                <button type='submit'> Create User</button>
+                <button  type='submit'> Create User</button>
                 <span> 
 
                 Já tem conta? <Link to="/login"> Login</Link>
@@ -68,7 +128,10 @@ function Register() {
             </form>
 
 
-        </FormContainer>
+        </FormContainer >
+
+        <ToastContainer />
+
     </>
   )
 }
